@@ -134,15 +134,19 @@ function drawPoints(dataPoints) {
                   .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
-                .style("opacity", .9);
+                .style("opacity", .9)
+                .style("background", "darkorange");
+
             div	.html(d.Player + "<br/>"+"<br/>"  + "3pt FGA%:"+ "<br/>" + d.threes + "<br/>" + "<br/>" +"3pt FG%:" + "<br/>" + d.threep  )
                 .style((d3.event.pageX) + "cx")
-                .style((d3.event.pageY - 28) + "cx");
+                .style((d3.event.pageY - 28) + "cx")
+
             })
         .on("mouseout", function(d) {
             div.transition()
                 .duration(500)
-                .style("opacity", 0.5);
+                .style("opacity", 0.9)
+                .style("background", "orange");
         })
 
                   .attr("r", 0)
