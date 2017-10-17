@@ -20,6 +20,11 @@ var selectedTeam;
 var scaleX;
 var scaleY;
 
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+
 d3.csv("players.csv", function(error, data) {
     if (error) { throw error };
 
@@ -115,7 +120,7 @@ function drawPoints(dataPoints) {
                 .attr("cy", function(d) {
                   return scaleY(d.threep)
                 })
-                .attr("r", 5)
+                .attr("r", 7)
                 .attr("fill", colorFill)
 
         selection.enter().append("circle")
@@ -125,11 +130,26 @@ function drawPoints(dataPoints) {
                   .attr("cy", function(d) {
                     return scaleY(d.threep)
                   })
+
+                  .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div	.html(d.Player + "<br/>"+"<br/>"  + "3pt FGA%:"+ "<br/>" + d.threes + "<br/>" + "<br/>" +"3pt FG%:" + "<br/>" + d.threep  )
+                .style((d3.event.pageX) + "cx")
+                .style((d3.event.pageY - 28) + "cx");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0.5);
+        })
+
                   .attr("r", 0)
                     .transition()
                     .duration(500)
                     .ease(d3.easeSin)
-                  .attr("r", 5)
+                  .attr("r", 7)
                   .attr("fill", colorFill)
 
 
@@ -146,10 +166,10 @@ function drawPoints(dataPoints) {
 
 function chartTitle() {
           svg.append("text")
-               .attr("x", 0)
+               .attr("x", 150)
                .attr("y", -50)
                .attr("font-size", 24)
-               .text("3-Point Shooting Efficiency, 2016");
+               .text("3-Point Field Goal Attempts, 2016");
 };
 
 
