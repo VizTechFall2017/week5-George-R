@@ -9,6 +9,22 @@ body {
   background: #FAFAFA;
 }
 
+div.tooltip {
+    margin-top: 200px;
+    margin-left: 800px;
+    position: absolute;
+    text-align: center;
+    width: 140px;
+    height: 100px;
+    padding: 2px;
+    font-family: Futura, sans-serif;
+    font: 12px sans-serif;
+    font-weight: bold;
+    background: orange;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
 
 
 }
