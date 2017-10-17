@@ -20,7 +20,7 @@ var selectedTeam;
 var scaleX;
 var scaleY;
 
-var div = d3.select("body").append("div")
+var div = d3.select(".svg-container").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -135,17 +135,17 @@ function drawPoints(dataPoints) {
             div.transition()
                 .duration(200)
                 .style("opacity", .9)
-                .style("background", "darkorange");
+                .style("background", "darkorange")
 
-            div	.html(d.Player + "<br/>"+"<br/>"  + "3pt FGA%:"+ "<br/>" + d.threes + "<br/>" + "<br/>" +"3pt FG%:" + "<br/>" + d.threep  )
-                .style((d3.event.pageX) + "cx")
-                .style((d3.event.pageY - 28) + "cx")
+            div	.html("<span>" + d.Player + "</span>" + "<br/>"+"<br/>"  + "3pt FGA%: <strong>" + d.threes+"</strong><br/>"  +"3pt FG%: <strong>"  + d.threep+ "</strong"  )
+                .style("left",(d3.event.pageX) + 10 + "px")
+                .style("top",(d3.event.pageY - 28) + "px")
 
             })
         .on("mouseout", function(d) {
             div.transition()
-                .duration(500)
-                .style("opacity", 0.9)
+                .duration(1000)
+                .style("opacity", 0)
                 .style("background", "orange");
         })
 
