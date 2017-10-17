@@ -1,126 +1,205 @@
-var svg = d3.select('svg')
-.append('g')
-.attr('transform', "translate(100,100)");
-var allData;
+var height = 600;
+var width = 800;
 
-var scaleX = d3.scaleLinear().domain([0,30]).range([0,600]);
-var scaleY = d3.scaleLinear().domain([60,0]).range([0,400]);
+var padding = { "top": 125,
+                "right": 100,
+                "bottom": 0,
+                "left": 100 };
 
-var currentYear = "Cavaliers";
+var nestedData;
 
-d3.csv('team.csv', function(dataIn){
 
-  allData = dataIn
+var svg = d3.select(".svg-container")
+              .append("svg")
+              .attr("height", height)
+              .attr("width", width)
+              .append("g")
+              .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
-  var data2016 = dataIn.filter(function(d){
-  return d.year =="Cavaliers";
+var selectedTeam;
+var scaleX;
+var scaleY;
+
+d3.csv("players.csv", function(error, data) {
+    if (error) { throw error };
+
+    data.forEach(function(d){
+      d.threep = +d.threep;
+      d.threes = +d.threes;
+
+    });
+
+    var dataIn = data.filter( function(d) {
+                     return d.threes >= 20
+    });
+
+    nestedData = d3.nest()
+        .key(function(d){ return d.Team })
+        .entries(dataIn)
+
+;
+
+    console.log(nestedData);
+
+    optionMenu();
+
+    chartTitle();
+
+    xLabel();
+    yLabel();
+
+    var firstElement = d3.select("option").property("value");
+
+    selectedTeam = updateData(firstElement);
+
+    scaleX = d3.scaleLinear()
+                 .domain([20, 70])
+                 .range([0, 600])
+
+
+    scaleY = d3.scaleLinear()
+                .domain([0.50,0])
+                .range([0, 400])
+
+
+
+    xAxis(scaleX);
+    yAxis(scaleY);
+
+
+    drawPoints(selectedTeam);
 
 });
 
-svg.selectAll('circle')
-  .data(data2016)
-  .enter()
-  .append('circle')
-  .attr('class', 'myCircles');
+function optionMenu() {
 
-svg.append('g')
-  .attr('transform', 'translate (0,400)')
-  .call(d3.axisBottom(scaleX));
+  var menu = d3.select(".menu-container")
+                 .append("select")
+                 .attr("name", "dropdown-menu")
+                 .attr("class", "dropdownmenu")
+                 .on("change", option);
 
-svg.append('g')
-  .attr('transform', 'translate (0,0) ')
-  .call(d3.axisLeft(scaleY));
-
-
-
-updateData(data2016);
-
-});
-
-function updateData(dataPoints) {
-
-  svg.selectAll('.myCircles')
-    .data(dataPoints)
-    .attr('cx', function(d){
-    return scaleX(d.range);
-
-
-  })
-    .attr('cy', function(d){
-    return scaleY(d.usage);
-
-  })
-    .attr('r', function(d){
-    return d.r;
-
-  })
-  .attr('fill', function(d){
-
-    return d.fill;
-
-  })
+      menu.selectAll("option")
+           .data(nestedData)
+           .enter()
+           .append("option")
+           .text(function(d) { return d.key })
+           .attr("value", function(d) { return d.key });
 };
 
-function buttonClicked(){
-  if (currentYear == "Cavaliers") {
-    var data2017 = allData.filter(function(d){
-     return d.year == "Warriors";
-});
-
-currentYear = "Warriors";
-
-updateData(data2017);
-
-}
-else {
-
-data2016 = allData.filter(function(d){
-  return d.year == "Cavaliers";
-});
-console.log(data2016)
-currentYear = "Cavaliers";
-updateData(data2016);
-}
 
 
-}
-window.setInterval(function(){
-  buttonClicked()
-}, 3000)
 
-svg.append('text')
-  .attr('x', 100)
-  .attr('y', 0)
-  .attr('font-size', 24)
-  .text('Clevelnad Cavaliers vs Golden State Warriors')
+function colorFill(d) { if (d.Team == "Raptors") {
+                                  return "#FF2819"
 
-svg.append('text')
-    .attr('x', 60)
-    .attr('y', 450)
-    .attr('font-size', 16)
-    .text(' < 8ft')
+                      } else if (d.Team== "Celtics") {
+                                  return "darkgreen"
+                                }
+                        else {
+                                  return "darkorange"
+                        }
+                     };
 
-svg.append('text')
-        .attr('x', 220)
-        .attr('y', 450)
-        .attr('font-size', 16)
-        .text('8-16ft')
+function drawPoints(dataPoints) {
 
-svg.append('text')
-            .attr('x', 380)
-            .attr('y', 450)
-            .attr('font-size', 16)
-            .text('16-24ft')
+        var selection = svg.selectAll("circle")
+            .data(dataPoints)
 
-svg.append('text')
-                        .attr('x', 470)
-                        .attr('y', 450)
-                        .attr('font-size', 16)
-                        .text('24ft+')
+       selection.transition()
+                .duration(500)
+                .ease(d3.easeSin)
+                .attr("cx", function(d) {
+                  return scaleX(d.threes)
+                })
+                .attr("cy", function(d) {
+                  return scaleY(d.threep)
+                })
+                .attr("r", 5)
+                .attr("fill", colorFill)
 
-svg.append('text')
-      .attr('transform', 'rotate(270)')
-      .attr('x', -220)
-      .attr('y', -50)
-      .attr('font-size', 16)
-      .text('Usage %')
+        selection.enter().append("circle")
+                  .attr("cx", function(d) {
+                    return scaleX(d.threes)
+                  })
+                  .attr("cy", function(d) {
+                    return scaleY(d.threep)
+                  })
+                  .attr("r", 0)
+                    .transition()
+                    .duration(500)
+                    .ease(d3.easeSin)
+                  .attr("r", 5)
+                  .attr("fill", colorFill)
+
+
+
+        selection.exit()
+                    .transition()
+                    .duration(200)
+                    .ease(d3.easeSin)
+                  .attr("r", 0)
+                 .remove();
+
+};
+
+
+function chartTitle() {
+          svg.append("text")
+               .attr("x", 0)
+               .attr("y", -50)
+               .attr("font-size", 24)
+               .text("3-Point Shooting Efficiency, 2016");
+};
+
+
+function xLabel() {
+          svg.append("text")
+              .attr("x", 300)
+              .attr("y", 440)
+              .attr("font-size", 13)
+              .attr("text-anchor", "middle")
+              .text("3pt FGA%");
+};
+
+function yLabel() {
+          svg.append("text")
+               .attr("transform", "rotate(270)")
+               .attr("x", -200)
+               .attr("y", -60)
+               .attr("font-size", 13)
+               .attr("text-anchor", "middle")
+               .text("3pt Shooting %");
+};
+
+
+function xAxis(scale) {
+          svg.append("g")
+              .attr("transform", "translate(0, 400)" )
+              .attr("class", "xAxis")
+              .call(d3.axisBottom(scale));
+};
+
+function yAxis(scale) {
+          svg.append("g")
+              .attr("transform", "translate(0,0)")
+              .attr("class", "yAxis")
+              .call(d3.axisLeft(scale));
+};
+
+function updateData(newSelection) {
+
+    return nestedData.filter(function(d){ return d.key == newSelection })[0].values
+};
+
+function option() {
+  selectValue = d3.select(this).property("value")
+  newData = updateData(selectValue);
+
+
+
+
+
+  drawPoints(newData);
+
+};

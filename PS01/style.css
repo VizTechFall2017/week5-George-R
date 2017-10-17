@@ -1,18 +1,15 @@
 text {
-  font-family: "Roboto", Verdana, sans-serif;
+  font-family: Futura, sans-serif;
 }
 
 body {
-  font-family: "Roboto Slab", Verdana, sans-serif;
+  font-family: Futura , sans-serif;
   display: flex;
   flex-direction: row;
   background: #FAFAFA;
 }
 
-.svg-container {
-    /*border: 1px solid black;*/
-    margin-top: 3%;
-    margin-left: 5%;
+
 
 }
 
@@ -26,5 +23,5 @@ body {
 }
 
 select {
-  font-family: "Roboto", Verdana, sans-serif;
+  font-family: Futura, sans-serif;
 }
